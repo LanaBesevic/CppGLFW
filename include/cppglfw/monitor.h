@@ -1,0 +1,27 @@
+#ifndef GLFW_MONITOR_H
+#define GLFW_MONITOR_H
+
+#include <GLFW/glfw3.h>
+#include <utility>
+#include <vector>
+#include <string_view>
+
+class Monitor {
+public:
+    explicit Monitor(GLFWmonitor* monitor);
+
+	std::pair<int32_t, int32_t> getPosition() const;
+
+	std::pair<int32_t, int32_t> getPhysicalSize() const;
+
+	std::string_view getName() const;
+
+	bool isPrimary() const;
+
+	GLFWmonitor* glfwHandle() const;
+
+private:
+	GLFWmonitor* monitor_;
+};
+
+#endif // GLFW_MONITOR_H
