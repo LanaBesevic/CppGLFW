@@ -25,9 +25,3 @@ else()
 endif()
 
 target_link_libraries(cpp-glfw glfw)
-
-file(GLOB_RECURSE MAIN_SRC_LIST "test/*.cpp")
-add_executable(main ${MAIN_SRC_LIST})
-target_link_libraries(main cpp-glfw)
-set_property(TARGET main PROPERTY CXX_STANDARD 17)
-set_property(TARGET main PROPERTY CXX_STANDARD_REQUIRED ON)

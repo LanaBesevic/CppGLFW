@@ -23,6 +23,13 @@ Window::Window(const std::string_view& title, const int32_t width, const int32_t
 	glfwSetWindowPosCallback(data_->window, &Window::onPositionChanged);
 	glfwSetWindowRefreshCallback(data_->window, &Window::onRefresh);
 	glfwSetWindowSizeCallback(data_->window, &Window::onResize);
+  glfwSetKeyCallback(data_->window, &Window::onKeyPress);
+  glfwSetCharCallback(data_->window, &Window::onCharInput);
+  glfwSetMouseButtonCallback(data_->window, &Window::onMouseButton);
+  glfwSetCursorPosCallback(data_->window, &Window::onCursorMove);
+  glfwSetCursorEnterCallback(data_->window, &Window::onCursorEnter);
+  glfwSetScrollCallback(data_->window, &Window::onScroll);
+  glfwSetDropCallback(data_->window, &Window::onFileDrop);
 }
 
 Window::Window() : data_(std::make_shared<WindowData>(nullptr)) {}
@@ -267,6 +274,130 @@ void Window::clearOnResizeCallbacks() const {
 	data_->on_resize_callbacks.clearCallbacks();
 }
 
+void Window::setOnKeyPressCallback(
+  const std::string& id, const std::function<void(Window, int32_t, int32_t, int32_t, int32_t)>& callback) const {
+  data_->on_key_press_callbacks.addCallback(id, callback);
+}
+
+void Window::removeOnKeyPressCallback(const std::string& id) const {
+  data_->on_key_press_callbacks.removeCallback(id);
+}
+
+void Window::clearOnKeyPressCallbacks() const {
+  data_->on_key_press_callbacks.clearCallbacks();
+}
+
+void Window::setOnCharInputCallback(const std::string& id,
+                                     const std::function<void(Window, uint32_t)>& callback) const {
+  data_->on_char_input_callbacks.addCallback(id, callback);
+}
+
+void Window::removeOnCharInputCallback(const std::string& id) const {
+  data_->on_char_input_callbacks.removeCallback(id);
+}
+
+void Window::clearOnCharInputCallbacks() const {
+  data_->on_char_input_callbacks.clearCallbacks();
+}
+
+void Window::setOnMouseButtonCallback(const std::string& id,
+                                       const std::function<void(Window, int32_t, int32_t, int32_t)>& callback) const {
+  data_->on_mouse_button_callbacks.addCallback(id, callback);
+}
+
+void Window::removeOnMouseButtonCallback(const std::string& id) const {
+  data_->on_mouse_button_callbacks.removeCallback(id);
+}
+
+void Window::clearOnMouseButtonCallbacks() const {
+  data_->on_mouse_button_callbacks.clearCallbacks();
+}
+
+void Window::setOnCursorMoveCallback(const std::string& id,
+                                       const std::function<void(Window, double, double)>& callback) const {
+  data_->on_cursor_move_callbacks.addCallback(id, callback);
+}
+
+void Window::removeOnCursorMoveCallback(const std::string& id) const {
+  data_->on_cursor_move_callbacks.removeCallback(id);
+}
+
+void Window::clearOnCursorMoveCallbacks() const {
+  data_->on_cursor_move_callbacks.clearCallbacks();
+}
+
+void Window::setOnCursorEnterCallback(const std::string& id,
+                                       const std::function<void(Window, bool)>& callback) const {
+  data_->on_cursor_enter_callbacks.addCallback(id, callback);
+}
+
+void Window::removeOnCursorEnterCallback(const std::string& id) const {
+  data_->on_cursor_enter_callbacks.removeCallback(id);
+}
+
+void Window::clearOnCursorEnterCallbacks() const {
+  data_->on_cursor_enter_callbacks.clearCallbacks();
+}
+
+void Window::setOnScrollCallback(const std::string& id,
+                                  const std::function<void(Window, double, double)>& callback) const {
+  data_->on_scroll_callbacks.addCallback(id, callback);
+}
+
+void Window::removeOnScrollCallback(const std::string& id) const {
+  data_->on_scroll_callbacks.removeCallback(id);
+}
+
+void Window::clearOnScrollCallbacks() const {
+  data_->on_scroll_callbacks.clearCallbacks();
+}
+
+void Window::setOnFileDropCallback(const std::string& id,
+                                    const std::function<void(Window, std::vector<std::string>)>& callback) const {
+  data_->on_file_drop_callbacks.addCallback(id, callback);
+}
+
+void Window::removeOnFileDropCallback(const std::string& id) const {
+  data_->on_file_drop_callbacks.removeCallback(id);
+}
+
+void Window::clearOnFileDropCallbacks() const {
+  data_->on_file_drop_callbacks.clearCallbacks();
+}
+
+
+int Window::getInputMode(int mode) const{
+    return glfwGetInputMode(data_->window, mode);
+}
+
+void Window::setInputMode(int mode, int value) const {
+    glfwSetInputMode(data_->window, mode, value);
+}
+
+int Window::getKey(int key) const {
+    return glfwGetKey(data_->window, key);
+}
+
+int Window::getMouseButton(int button) const {
+    return glfwGetMouseButton(data_->window, button);
+}
+
+void Window::getCursorPos(double* xpos, double* ypos) const {
+    glfwGetCursorPos(data_->window, xpos, ypos);
+}
+
+void Window::setCursorPos(double xpos, double ypos) const {
+    glfwSetCursorPos(data_->window, xpos, ypos);
+}
+
+void Window::setClipboardString(const char* string) const {
+    glfwSetClipboardString(data_->window, string);
+}
+
+const char* Window::getClipboardString() const {
+    return glfwGetClipboardString(data_->window);
+}
+
 #ifdef GLFW_INCLUDE_VULKAN
 
 vk::ResultValue<vk::SurfaceKHR> Window::createWindowSurface(const vk::Instance& instance,
@@ -288,36 +419,79 @@ GLFWwindow* Window::glfwHandle() const {
 
 void Window::onClose(GLFWwindow* glfw_window) {
     auto* data = reinterpret_cast<WindowData*>(glfwGetWindowUserPointer(glfw_window));
-	data->on_close_callbacks.triggerCallbacks(Window(data->getSharedPtr()));
+	data->on_close_callbacks.triggerCallbacks(Window(data->shared_from_this()));
 }
 
 void Window::onFocus(GLFWwindow* glfw_window, const int32_t focused) {
 	auto* data = reinterpret_cast<WindowData*>(glfwGetWindowUserPointer(glfw_window));
-    data->on_focus_callbacks.triggerCallbacks(Window(data->getSharedPtr()), focused != 0);
+    data->on_focus_callbacks.triggerCallbacks(Window(data->shared_from_this()), focused != 0);
 }
 
 void Window::onIconify(GLFWwindow* glfw_window, const int32_t iconified) {
 	auto* data = reinterpret_cast<WindowData*>(glfwGetWindowUserPointer(glfw_window));
-	data->on_iconify_callbacks.triggerCallbacks(Window(data->getSharedPtr()), iconified != 0);
+	data->on_iconify_callbacks.triggerCallbacks(Window(data->shared_from_this()), iconified != 0);
 }
 
 void Window::onPositionChanged(GLFWwindow* glfw_window, const int32_t x, const int32_t y) {
 	auto* data = reinterpret_cast<WindowData*>(glfwGetWindowUserPointer(glfw_window));
-    data->on_position_changed_callbacks.triggerCallbacks(Window(data->getSharedPtr()), x, y);
+    data->on_position_changed_callbacks.triggerCallbacks(Window(data->shared_from_this()), x, y);
 }
 
 void Window::onRefresh(GLFWwindow* glfw_window) {
 	auto* data = reinterpret_cast<WindowData*>(glfwGetWindowUserPointer(glfw_window));
-    data->on_refresh_callbacks.triggerCallbacks(Window(data->getSharedPtr()));
+    data->on_refresh_callbacks.triggerCallbacks(Window(data->shared_from_this()));
 }
 
 void Window::onResize(GLFWwindow* glfw_window, const int32_t width, const int32_t height) {
 	auto* data = reinterpret_cast<WindowData*>(glfwGetWindowUserPointer(glfw_window));
-	data->on_resize_callbacks.triggerCallbacks(Window(data->getSharedPtr()), width, height);
+	data->on_resize_callbacks.triggerCallbacks(Window(data->shared_from_this()), width, height);
 }
+
+void Window::onKeyPress(GLFWwindow* glfw_window, int32_t key, int32_t scancode, int32_t action, int32_t mods) {
+  auto* data = reinterpret_cast<WindowData*>(glfwGetWindowUserPointer(glfw_window));
+  data->on_key_press_callbacks.triggerCallbacks(Window(data->shared_from_this()), key, scancode, action, mods);
+}
+
+void Window::onCharInput(GLFWwindow* glfw_window, uint32_t codepoint) {
+  auto* data = reinterpret_cast<WindowData*>(glfwGetWindowUserPointer(glfw_window));
+  data->on_char_input_callbacks.triggerCallbacks(Window(data->shared_from_this()), codepoint);
+}
+
+void Window::onMouseButton(GLFWwindow* glfw_window, int32_t button, int32_t action, int32_t mods) {
+  auto* data = reinterpret_cast<WindowData*>(glfwGetWindowUserPointer(glfw_window));
+  data->on_mouse_button_callbacks.triggerCallbacks(Window(data->shared_from_this()), button, action, mods);
+}
+
+void Window::onCursorMove(GLFWwindow* glfw_window, double xpos, double ypos) {
+  auto* data = reinterpret_cast<WindowData*>(glfwGetWindowUserPointer(glfw_window));
+  data->on_cursor_move_callbacks.triggerCallbacks(Window(data->shared_from_this()), xpos, ypos);
+}
+
+void Window::onCursorEnter(GLFWwindow* glfw_window, int32_t entered) {
+  auto* data = reinterpret_cast<WindowData*>(glfwGetWindowUserPointer(glfw_window));
+  data->on_cursor_enter_callbacks.triggerCallbacks(Window(data->shared_from_this()), entered == GLFW_TRUE);
+}
+
+void Window::onScroll(GLFWwindow* glfw_window, double xoffset, double yoffset) {
+  auto* data = reinterpret_cast<WindowData*>(glfwGetWindowUserPointer(glfw_window));
+  data->on_scroll_callbacks.triggerCallbacks(Window(data->shared_from_this()), xoffset, yoffset);
+}
+
+void Window::onFileDrop(GLFWwindow* glfw_window, int32_t count, const char** paths) {
+  auto* data = reinterpret_cast<WindowData*>(glfwGetWindowUserPointer(glfw_window));
+
+  std::vector<std::string> strPaths;
+  for (int32_t i = 0; i < count; i++) {
+    strPaths.emplace_back(paths[i]);
+  }
+
+  data->on_file_drop_callbacks.triggerCallbacks(Window(data->shared_from_this()), strPaths);
+}
+
 
 Window::WindowData::WindowData(GLFWwindow* window)
     : window(window), destroyed(window == nullptr) { }
 
 Window::Window(std::shared_ptr<WindowData> data) : data_(std::move(data)) {
 }
+
