@@ -1,4 +1,4 @@
-#include "cppglfw/monitor.h"
+#include "cppglfw/Monitor.h"
 
 Monitor::Monitor(GLFWmonitor* monitor)
     : monitor_(monitor) {}

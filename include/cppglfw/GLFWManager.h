@@ -3,8 +3,8 @@
 
 #include <GLFW/glfw3.h>
 #include <vector>
-#include "monitor.h"
-#include "window.h"
+#include "Monitor.h"
+#include "Window.h"
 
 class GLFWManager {
  public:
@@ -34,7 +34,7 @@ class GLFWManager {
 
   const char* getKeyName(int key, int scancode) const;
 
-  int getKeyScancode (int key) const;
+  int getKeyScancode(int key) const;
 
   bool joystickPresent(int jid) const;
 
@@ -50,7 +50,7 @@ class GLFWManager {
 
   void setJoystickUserPointer(int jid, void* pointer) const;
 
-  void* getJoystickUserPointer (int jid) const;
+  void* getJoystickUserPointer(int jid) const;
 
   bool joystickIsGamepad(int jid) const;
 

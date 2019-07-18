@@ -1,4 +1,4 @@
-#include "cppglfw/glfw_manager.h"
+#include "cppglfw/GLFWManager.h"
 
 std::vector<Monitor> GLFWManager::getMonitors() const {
   int32_t count = 0;

@@ -1,4 +1,4 @@
-#include "cppglfw/window.h"
+#include "cppglfw/Window.h"
 
 Window::Window(const std::string_view& title, const int32_t width, const int32_t height, std::optional<Monitor> monitor, std::optional<Window> window)
     : data_(nullptr) {

@@ -8,7 +8,7 @@
 #include <memory>
 #include <optional>
 #include <vulkan/vulkan.hpp>
-#include "cppglfw/monitor.h"
+#include "cppglfw/Monitor.h"
 
 template <typename IdentifierType, typename... CallbackArgs>
 class CallbackCollection {
