@@ -25,10 +25,8 @@ class GLFWManager {
 
   void pollEvents() const;
 
-  template <typename... Args>
-  Window createWindow(Args... args) {
-    return Window(args...);
-  }
+  Window createWindow(const std::string_view& title, int32_t width, int32_t height,
+                      const std::optional<Monitor>& monitor = {}, const std::optional<Window>& window = {});
 
   bool rawMouseMotionSupported() const;
 
