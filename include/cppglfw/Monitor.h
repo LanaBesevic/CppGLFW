@@ -1,27 +1,32 @@
 #ifndef GLFW_MONITOR_H
 #define GLFW_MONITOR_H
 
+#define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
+#include <string_view>
 #include <utility>
 #include <vector>
-#include <string_view>
+
+namespace cppglfw {
 
 class Monitor {
-public:
-    explicit Monitor(GLFWmonitor* monitor);
+ public:
+  explicit Monitor(GLFWmonitor* monitor);
 
-	std::pair<int32_t, int32_t> getPosition() const;
+  std::pair<int32_t, int32_t> getPosition() const;
 
-	std::pair<int32_t, int32_t> getPhysicalSize() const;
+  std::pair<int32_t, int32_t> getPhysicalSize() const;
 
-	std::string_view getName() const;
+  std::string_view getName() const;
 
-	bool isPrimary() const;
+  bool isPrimary() const;
 
-	GLFWmonitor* glfwHandle() const;
+  GLFWmonitor* glfwHandle() const;
 
-private:
-	GLFWmonitor* monitor_;
+ private:
+  GLFWmonitor* monitor_;
 };
+
+} // namespace cppglfw
 
 #endif // GLFW_MONITOR_H

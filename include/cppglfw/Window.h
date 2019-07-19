@@ -10,6 +10,8 @@
 #include <vulkan/vulkan.hpp>
 #include "cppglfw/Monitor.h"
 
+namespace cppglfw {
+
 template <typename IdentifierType, typename... CallbackArgs>
 class CallbackCollection {
  public:
@@ -122,7 +124,8 @@ class Window {
 
   void clearOnResizeCallbacks() const;
 
-  void setOnKeyPressCallback(const std::string& id, const std::function<void(Window, int32_t, int32_t, int32_t, int32_t)>& callback) const;
+  void setOnKeyPressCallback(const std::string& id,
+                             const std::function<void(Window, int32_t, int32_t, int32_t, int32_t)>& callback) const;
 
   void removeOnKeyPressCallback(const std::string& id) const;
 
@@ -134,13 +137,15 @@ class Window {
 
   void clearOnCharInputCallbacks() const;
 
-  void setOnMouseButtonCallback(const std::string& id, const std::function<void(Window, int32_t, int32_t, int32_t)>& callback) const;
+  void setOnMouseButtonCallback(const std::string& id,
+                                const std::function<void(Window, int32_t, int32_t, int32_t)>& callback) const;
 
   void removeOnMouseButtonCallback(const std::string& id) const;
 
   void clearOnMouseButtonCallbacks() const;
 
-  void setOnCursorMoveCallback(const std::string& id, const std::function<void(Window, double, double)>& callback) const;
+  void setOnCursorMoveCallback(const std::string& id,
+                               const std::function<void(Window, double, double)>& callback) const;
 
   void removeOnCursorMoveCallback(const std::string& id) const;
 
@@ -158,12 +163,12 @@ class Window {
 
   void clearOnScrollCallbacks() const;
 
-  void setOnFileDropCallback(const std::string& id, const std::function<void(Window, std::vector<std::string>)>& callback) const;
+  void setOnFileDropCallback(const std::string& id,
+                             const std::function<void(Window, std::vector<std::string>)>& callback) const;
 
   void removeOnFileDropCallback(const std::string& id) const;
 
   void clearOnFileDropCallbacks() const;
-
 
   int getInputMode(int mode) const;
 
@@ -181,11 +186,9 @@ class Window {
 
   const char* getClipboardString() const;
 
-#ifdef GLFW_INCLUDE_VULKAN
   vk::ResultValue<vk::SurfaceKHR>
     createWindowSurface(const vk::Instance& instance,
                         std::optional<const vk::AllocationCallbacks> allocation_callbacks = {});
-#endif
 
   GLFWwindow* glfwHandle() const;
 
@@ -245,5 +248,7 @@ class Window {
 
   std::shared_ptr<WindowData> data_;
 };
+
+} // namespace cppglfw
 
 #endif

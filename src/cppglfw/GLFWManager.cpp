@@ -1,10 +1,13 @@
 #include "cppglfw/GLFWManager.h"
 
+namespace cppglfw {
+
 std::vector<Monitor> GLFWManager::getMonitors() const {
   int32_t count = 0;
   GLFWmonitor** glfw_monitors = glfwGetMonitors(&count);
 
   std::vector<Monitor> monitors;
+  monitors.reserve(count);
   for (int32_t i = 0; i < count; i++) {
     monitors.emplace_back(glfw_monitors[i]);
   }
@@ -97,9 +100,17 @@ uint64_t GLFWManager::getTimerFrequency() const {
   return glfwGetTimerFrequency();
 }
 
-#ifdef GLFW_INCLUDE_VULKAN
 bool GLFWManager::vulkanSupported() const {
   return glfwVulkanSupported() != 0;
+}
+
+bool GLFWManager::getPhysicalDevicePresentationSupport(VkInstance instance, VkPhysicalDevice device,
+                                                       uint32_t queueFamily) const {
+  return glfwGetPhysicalDevicePresentationSupport(instance, device, queueFamily) == GLFW_TRUE;
+}
+
+GLFWvkproc GLFWManager::getInstanceProcAddress(VkInstance instance, const std::string_view& procName) const {
+  return glfwGetInstanceProcAddress(instance, procName.data());
 }
 
 std::vector<const char*> GLFWManager::getRequiredInstanceExtensions() const {
@@ -108,4 +119,4 @@ std::vector<const char*> GLFWManager::getRequiredInstanceExtensions() const {
   return std::vector<const char*>(extensions, extensions + count);
 }
 
-#endif
+} // namespace cppglfw

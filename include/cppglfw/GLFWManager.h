@@ -1,10 +1,14 @@
 #ifndef GLFW_MANAGER_H
 #define GLFW_MANAGER_H
 
+#define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
+#include <string_view>
 #include <vector>
 #include "Monitor.h"
 #include "Window.h"
+
+namespace cppglfw {
 
 class GLFWManager {
  public:
@@ -64,11 +68,13 @@ class GLFWManager {
 
   uint64_t getTimerFrequency() const;
 
-#ifdef GLFW_INCLUDE_VULKAN
   bool vulkanSupported() const;
 
   std::vector<const char*> getRequiredInstanceExtensions() const;
-#endif
+
+  bool getPhysicalDevicePresentationSupport(VkInstance instance, VkPhysicalDevice device, uint32_t queueFamily) const;
+
+  GLFWvkproc getInstanceProcAddress(VkInstance instance, const std::string_view& procName) const;
 
  private:
   GLFWManager() {
@@ -77,5 +83,7 @@ class GLFWManager {
     }
   }
 };
+
+} // namespace cppglfw
 
 #endif // GLFW_MANAGER_H
