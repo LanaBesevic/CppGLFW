@@ -104,15 +104,6 @@ bool GLFWManager::vulkanSupported() const {
   return glfwVulkanSupported() != 0;
 }
 
-bool GLFWManager::getPhysicalDevicePresentationSupport(VkInstance instance, VkPhysicalDevice device,
-                                                       uint32_t queueFamily) const {
-  return glfwGetPhysicalDevicePresentationSupport(instance, device, queueFamily) == GLFW_TRUE;
-}
-
-GLFWvkproc GLFWManager::getInstanceProcAddress(VkInstance instance, const std::string_view& procName) const {
-  return glfwGetInstanceProcAddress(instance, procName.data());
-}
-
 std::vector<const char*> GLFWManager::getRequiredInstanceExtensions() const {
   uint32_t count;
   const char** extensions = glfwGetRequiredInstanceExtensions(&count);

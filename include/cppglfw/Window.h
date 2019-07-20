@@ -1,13 +1,15 @@
 #ifndef GLFW_WINDOW_H
 #define GLFW_WINDOW_H
 
-#define GLFW_INCLUDE_VULKAN
+#ifdef GLFW_INCLUDE_VULKAN
+#include <vulkan/vulkan.hpp>
+#endif
+
 #include <GLFW/glfw3.h>
 #include <functional>
 #include <map>
 #include <memory>
 #include <optional>
-#include <vulkan/vulkan.hpp>
 #include "cppglfw/Monitor.h"
 
 namespace cppglfw {
@@ -186,9 +188,19 @@ class Window {
 
   const char* getClipboardString() const;
 
-  vk::ResultValue<vk::SurfaceKHR>
+#ifdef VK_VERSION_1_0
+  inline vk::ResultValue<vk::SurfaceKHR>
     createWindowSurface(const vk::Instance& instance,
-                        std::optional<const vk::AllocationCallbacks> allocation_callbacks = {});
+                        std::optional<const vk::AllocationCallbacks> allocation_callbacks = {}) {
+    vk::SurfaceKHR surface;
+    auto result = vk::Result(glfwCreateWindowSurface(
+      static_cast<VkInstance>(instance), data_->window,
+      allocation_callbacks.has_value() ? (VkAllocationCallbacks*) &allocation_callbacks.value() : nullptr,
+      (VkSurfaceKHR*) &surface));
+
+    return vk::ResultValue<vk::SurfaceKHR>(result, surface);
+  }
+#endif
 
   GLFWwindow* glfwHandle() const;
 

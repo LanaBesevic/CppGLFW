@@ -1,7 +1,10 @@
 #ifndef GLFW_MONITOR_H
 #define GLFW_MONITOR_H
 
-#define GLFW_INCLUDE_VULKAN
+#ifdef GLFW_INCLUDE_VULKAN
+#include <vulkan/vulkan.hpp>
+#endif
+
 #include <GLFW/glfw3.h>
 #include <string_view>
 #include <utility>

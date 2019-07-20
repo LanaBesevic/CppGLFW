@@ -1,7 +1,10 @@
 #ifndef GLFW_MANAGER_H
 #define GLFW_MANAGER_H
 
-#define GLFW_INCLUDE_VULKAN
+#ifdef GLFW_INCLUDE_VULKAN
+#include <vulkan/vulkan.hpp>
+#endif
+
 #include <GLFW/glfw3.h>
 #include <string_view>
 #include <vector>
@@ -72,9 +75,19 @@ class GLFWManager {
 
   std::vector<const char*> getRequiredInstanceExtensions() const;
 
-  bool getPhysicalDevicePresentationSupport(VkInstance instance, VkPhysicalDevice device, uint32_t queueFamily) const;
+#ifdef VK_VERSION_1_0
 
-  GLFWvkproc getInstanceProcAddress(VkInstance instance, const std::string_view& procName) const;
+  inline bool getPhysicalDevicePresentationSupport(vk::Instance instance, vk::PhysicalDevice device,
+                                                   uint32_t queueFamily) const {
+    return glfwGetPhysicalDevicePresentationSupport(static_cast<VkInstance>(instance),
+                                                    static_cast<VkPhysicalDevice>(device), queueFamily) == GLFW_TRUE;
+  }
+
+  inline GLFWvkproc getInstanceProcAddress(vk::Instance instance, const std::string_view& procName) const {
+    return glfwGetInstanceProcAddress(static_cast<VkInstance>(instance), procName.data());
+  }
+
+#endif
 
  private:
   GLFWManager() {

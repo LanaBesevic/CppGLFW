@@ -400,18 +400,6 @@ const char* Window::getClipboardString() const {
   return glfwGetClipboardString(data_->window);
 }
 
-vk::ResultValue<vk::SurfaceKHR>
-  Window::createWindowSurface(const vk::Instance& instance,
-                              std::optional<const vk::AllocationCallbacks> allocation_callbacks) {
-  vk::SurfaceKHR surface;
-  vk::Result result = vk::Result(glfwCreateWindowSurface(
-    (VkInstance) instance, data_->window,
-    allocation_callbacks.has_value() ? (VkAllocationCallbacks*) &allocation_callbacks.value() : nullptr,
-    (VkSurfaceKHR*) &surface));
-
-  return vk::ResultValue<vk::SurfaceKHR>(result, surface);
-}
-
 GLFWwindow* Window::glfwHandle() const {
   return data_->window;
 }
