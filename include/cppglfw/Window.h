@@ -10,6 +10,7 @@
 #include <map>
 #include <memory>
 #include <optional>
+#include <variant>
 #include "cppglfw/Monitor.h"
 
 namespace cppglfw {
@@ -46,6 +47,8 @@ class Window {
   Window();
 
   friend class GLFWManager;
+
+  void makeContextCurrent() const;
 
   void swapBuffers() const;
 
@@ -205,7 +208,8 @@ class Window {
   GLFWwindow* glfwHandle() const;
 
  protected:
-  Window(const std::string_view& title, int32_t width, int32_t height, std::optional<Monitor> monitor = {},
+  Window(const std::string_view& title, int32_t width, int32_t height,
+         const std::map<int32_t, std::variant<int32_t, std::string>>& hints = {}, std::optional<Monitor> monitor = {},
          std::optional<Window> window = {});
 
   static void onClose(GLFWwindow* glfw_window);

@@ -33,6 +33,7 @@ class GLFWManager {
   void pollEvents() const;
 
   Window createWindow(const std::string_view& title, int32_t width, int32_t height,
+                      const std::map<int32_t, std::variant<int32_t, std::string>>& hints = {},
                       const std::optional<Monitor>& monitor = {}, const std::optional<Window>& window = {});
 
   bool rawMouseMotionSupported() const;
@@ -71,6 +72,12 @@ class GLFWManager {
 
   uint64_t getTimerFrequency() const;
 
+  void swapInterval(int32_t interval) const;
+
+  bool isExtensionSupported(const std::string_view& extension) const;
+
+  GLFWglproc getProcAddress(const std::string_view& extension) const;
+
   bool vulkanSupported() const;
 
   std::vector<const char*> getRequiredInstanceExtensions() const;
@@ -89,12 +96,10 @@ class GLFWManager {
 
 #endif
 
+  ~GLFWManager();
+
  private:
-  GLFWManager() {
-    if (!glfwInit()) {
-      throw std::runtime_error("Failed to initialize GLFW.");
-    }
-  }
+  GLFWManager();
 };
 
 } // namespace cppglfw

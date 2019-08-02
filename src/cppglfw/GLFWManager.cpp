@@ -24,8 +24,9 @@ void GLFWManager::pollEvents() const {
 }
 
 Window GLFWManager::createWindow(const std::string_view& title, int32_t width, int32_t height,
+                                 const std::map<int32_t, std::variant<int32_t, std::string>>& hints,
                                  const std::optional<Monitor>& monitor, const std::optional<Window>& window) {
-  return Window(title, width, height, monitor, window);
+  return Window(title, width, height, hints, monitor, window);
 }
 
 bool GLFWManager::rawMouseMotionSupported() const {
@@ -100,6 +101,17 @@ uint64_t GLFWManager::getTimerFrequency() const {
   return glfwGetTimerFrequency();
 }
 
+void GLFWManager::swapInterval(int32_t interval) const {
+  glfwSwapInterval(interval);
+}
+
+bool GLFWManager::isExtensionSupported(const std::string_view& extension) const {
+  return glfwExtensionSupported(extension.data()) == GLFW_TRUE;
+}
+GLFWglproc GLFWManager::getProcAddress(const std::string_view& extension) const {
+  return glfwGetProcAddress(extension.data());
+}
+
 bool GLFWManager::vulkanSupported() const {
   return glfwVulkanSupported() != 0;
 }
@@ -108,6 +120,16 @@ std::vector<const char*> GLFWManager::getRequiredInstanceExtensions() const {
   uint32_t count;
   const char** extensions = glfwGetRequiredInstanceExtensions(&count);
   return std::vector<const char*>(extensions, extensions + count);
+}
+
+GLFWManager::~GLFWManager() {
+  glfwTerminate();
+}
+
+GLFWManager::GLFWManager() {
+  if (!glfwInit()) {
+    throw std::runtime_error("Failed to initialize GLFW.");
+  }
 }
 
 } // namespace cppglfw

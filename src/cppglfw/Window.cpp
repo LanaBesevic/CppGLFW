@@ -2,10 +2,24 @@
 
 namespace cppglfw {
 
-Window::Window(const std::string_view& title, const int32_t width, const int32_t height, std::optional<Monitor> monitor,
+Window::Window(const std::string_view& title, const int32_t width, const int32_t height,
+               const std::map<int32_t, std::variant<int32_t, std::string>>& hints, std::optional<Monitor> monitor,
                std::optional<Window> window)
   : data_(nullptr) {
-  glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+  for (const auto& hint : hints) {
+    std::visit(
+      [hint](const auto& value) {
+        using T = std::decay_t<decltype(value)>;
+
+        if constexpr (std::is_same_v<T, int32_t>) {
+          glfwWindowHint(hint.first, value);
+        } else if constexpr (std::is_same_v<T, std::string>) {
+          glfwWindowHintString(hint.first, value.c_str());
+        }
+      },
+      hint.second);
+  }
+
   GLFWwindow* glfw_window =
     glfwCreateWindow(width, height, title.data(), monitor.has_value() ? monitor.value().glfwHandle() : nullptr,
                      window.has_value() ? window.value().glfwHandle() : nullptr);
@@ -35,6 +49,10 @@ Window::Window(const std::string_view& title, const int32_t width, const int32_t
 }
 
 Window::Window() : data_(std::make_shared<WindowData>(nullptr)) {}
+
+void Window::makeContextCurrent() const {
+  glfwMakeContextCurrent(data_->window);
+}
 
 void Window::swapBuffers() const {
   glfwSwapBuffers(data_->window);
