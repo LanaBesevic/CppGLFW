@@ -9,6 +9,7 @@
 #include <functional>
 #include <map>
 #include <memory>
+#include <stdexcept>
 #include <optional>
 #include <variant>
 #include "cppglfw/Monitor.h"
